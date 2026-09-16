@@ -1,0 +1,1352 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Interaktif: Operasi Aljabar & PLSV 1-2 Langkah (30 Soal)</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <!-- Google Fonts: Plus Jakarta Sans -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- KaTeX CSS & JS for Math Rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f8fafc;
+        }
+        .lang-btn.active {
+            background-color: #312e81;
+            color: #ffffff;
+            border-color: #818cf8;
+        }
+        .nav-num.answered-correct {
+            background-color: #10b981;
+            color: white;
+            border-color: #059669;
+        }
+        .nav-num.answered-wrong {
+            background-color: #ef4444;
+            color: white;
+            border-color: #dc2626;
+        }
+        .nav-num.active-q {
+            ring: 3px;
+            ring-color: #6366f1;
+            transform: scale(1.08);
+            font-weight: 800;
+        }
+        .cambridge-badge {
+            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+        }
+        /* Custom Scrollbar for navigation drawer */
+        .custom-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="text-slate-800 pb-16 min-h-screen flex flex-col justify-between">
+
+    <!-- Header / Top Bar -->
+    <header class="bg-indigo-700 text-white sticky top-0 z-40 shadow-lg">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-3">
+            <div class="flex items-center space-x-3">
+                <div class="bg-white/20 p-2.5 rounded-xl flex items-center justify-center">
+                    <i class="fa-solid fa-list-check text-2xl text-amber-300"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg md:text-xl leading-tight">
+                        <span class="lang-id">Quiz Interaktif Aljabar & PLSV</span>
+                        <span class="lang-en hidden">Algebra & Linear Equations Quiz</span>
+                        <span class="lang-bi">Interactive Quiz: Aljabar & PLSV</span>
+                    </h1>
+                    <p class="text-xs text-indigo-200">
+                        <span class="lang-id">30 Soal • Kurikulum Merdeka & Cambridge Stage 7-8</span>
+                        <span class="lang-en hidden">30 Questions • Cambridge & National Curriculum</span>
+                        <span class="lang-bi">30 Soal / Questions • Cambridge & Kurikulum Merdeka</span>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Language Switcher & Controls -->
+            <div class="flex items-center space-x-2">
+                <div class="bg-indigo-900/80 p-1 rounded-xl flex space-x-1 text-xs font-bold border border-indigo-400/30">
+                    <button onclick="setLanguage('id')" id="lang-btn-id" class="lang-btn px-2.5 py-1 rounded-lg transition hover:bg-indigo-700">🇮🇩 ID</button>
+                    <button onclick="setLanguage('en')" id="lang-btn-en" class="lang-btn px-2.5 py-1 rounded-lg transition hover:bg-indigo-700">🇬🇧 EN</button>
+                    <button onclick="setLanguage('bi')" id="lang-btn-bi" class="lang-btn active px-2.5 py-1 rounded-lg transition hover:bg-indigo-700">🌐 Both</button>
+                </div>
+
+                <button onclick="confirmResetQuiz()" title="Reset Progress" class="bg-rose-600 hover:bg-rose-700 text-white text-xs px-3 py-1.5 rounded-xl font-bold transition flex items-center space-x-1 border border-rose-400/40">
+                    <i class="fa-solid fa-rotate-right"></i>
+                    <span class="hidden sm:inline">Reset</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Global Progress Bar -->
+        <div class="w-full bg-indigo-950 h-2 relative">
+            <div id="progress-bar-fill" class="bg-gradient-to-r from-amber-400 to-emerald-400 h-full transition-all duration-300 w-0"></div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="max-w-6xl mx-auto px-4 mt-6 w-full flex-grow">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+            <!-- LEFT COLUMN: Question Display & Answer Options (8 Cols) -->
+            <div class="lg:col-span-8 flex flex-col space-y-4">
+
+                <!-- Topic Category Banner -->
+                <div class="flex items-center justify-between bg-white px-5 py-3 rounded-2xl border border-slate-200 shadow-sm">
+                    <div class="flex items-center space-x-2">
+                        <span id="topic-badge" class="bg-indigo-100 text-indigo-800 text-xs font-extrabold px-3 py-1 rounded-full uppercase tracking-wider">
+                            Topic: Operasi Aljabar
+                        </span>
+                    </div>
+                    <div class="text-xs font-bold text-slate-500">
+                        <span class="lang-id">Soal</span><span class="lang-en hidden">Question</span><span class="lang-bi">Soal / Question</span> 
+                        <span id="current-q-num-text" class="text-indigo-600 font-extrabold text-sm">1</span> / 30
+                    </div>
+                </div>
+
+                <!-- Main Question Card -->
+                <div class="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-slate-200 flex flex-col justify-between min-h-[380px]">
+                    
+                    <!-- Question Prompt -->
+                    <div>
+                        <div class="flex items-start justify-between gap-2 mb-4">
+                            <span id="q-number-pill" class="bg-slate-800 text-white font-black text-sm px-3 py-1 rounded-xl">
+                                Q1
+                            </span>
+                            <span id="q-status-badge" class="text-xs font-bold px-2.5 py-1 rounded-lg bg-slate-100 text-slate-500">
+                                Unanswered / Belum Diisi
+                            </span>
+                        </div>
+
+                        <!-- Question Text Bilingual -->
+                        <div class="text-slate-800 text-lg md:text-xl font-bold leading-relaxed mb-6" id="question-text-box">
+                            <!-- Injected dynamically -->
+                        </div>
+
+                        <!-- Math Formula Box -->
+                        <div id="math-formula-box" class="bg-slate-50 border-2 border-indigo-100 rounded-2xl p-4 text-center text-2xl md:text-3xl font-black text-indigo-700 my-4 shadow-inner">
+                            <!-- Injected dynamically -->
+                        </div>
+                    </div>
+
+                    <!-- Options Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5 mt-6" id="options-container">
+                        <!-- Options injected dynamically -->
+                    </div>
+
+                    <!-- Immediate Feedback & Explanation Box -->
+                    <div id="explanation-box" class="mt-6 p-5 rounded-2xl hidden transition-all duration-300 border-2">
+                        <div class="flex items-center space-x-2 font-black text-base mb-2" id="explanation-title">
+                            <!-- Correct / Incorrect Header -->
+                        </div>
+                        <div class="text-sm text-slate-700 leading-relaxed font-medium space-y-1" id="explanation-body">
+                            <!-- Detailed step-by-step math explanation -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation Action Buttons -->
+                <div class="flex flex-wrap items-center justify-between gap-3 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+                    <button onclick="navigateQuestion(-1)" id="prev-btn" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-extrabold px-5 py-2.5 rounded-xl transition flex items-center space-x-2 text-sm disabled:opacity-40 disabled:cursor-not-allowed">
+                        <i class="fa-solid fa-arrow-left"></i>
+                        <span>
+                            <span class="lang-id">Sebelumnya</span><span class="lang-en hidden">Previous</span><span class="lang-bi">Prev</span>
+                        </span>
+                    </button>
+
+                    <button onclick="jumpNextUnanswered()" class="bg-amber-100 hover:bg-amber-200 text-amber-900 font-extrabold px-4 py-2.5 rounded-xl transition text-xs flex items-center space-x-1.5 border border-amber-300">
+                        <i class="fa-solid fa-forward-step"></i>
+                        <span>
+                            <span class="lang-id">Soal Belum Diisi</span><span class="lang-en hidden">Next Unanswered</span><span class="lang-bi">Next Unanswered ⏩</span>
+                        </span>
+                    </button>
+
+                    <button onclick="navigateQuestion(1)" id="next-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold px-5 py-2.5 rounded-xl transition flex items-center space-x-2 text-sm disabled:opacity-40 disabled:cursor-not-allowed">
+                        <span>
+                            <span class="lang-id">Berikutnya</span><span class="lang-en hidden">Next</span><span class="lang-bi">Next</span>
+                        </span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+
+            </div>
+
+            <!-- RIGHT COLUMN: Question Palette & Live Score Card (4 Cols) -->
+            <div class="lg:col-span-4 flex flex-col space-y-6">
+
+                <!-- Score Summary Box -->
+                <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200">
+                    <h3 class="font-extrabold text-slate-800 text-sm uppercase tracking-wider mb-4 flex items-center justify-between">
+                        <span>
+                            <span class="lang-id">Ringkasan Skor</span><span class="lang-en hidden">Score Summary</span><span class="lang-bi">Score Summary</span>
+                        </span>
+                        <i class="fa-solid fa-chart-pie text-indigo-600"></i>
+                    </h3>
+
+                    <div class="grid grid-cols-3 gap-2 text-center">
+                        <div class="bg-emerald-50 border border-emerald-200 p-3 rounded-xl">
+                            <div class="text-2xl font-black text-emerald-600" id="stat-correct">0</div>
+                            <div class="text-[11px] font-bold text-emerald-800 uppercase mt-0.5">
+                                <span class="lang-id">Benar</span><span class="lang-en hidden">Correct</span><span class="lang-bi">Correct</span>
+                            </div>
+                        </div>
+                        <div class="bg-rose-50 border border-rose-200 p-3 rounded-xl">
+                            <div class="text-2xl font-black text-rose-600" id="stat-wrong">0</div>
+                            <div class="text-[11px] font-bold text-rose-800 uppercase mt-0.5">
+                                <span class="lang-id">Salah</span><span class="lang-en hidden">Wrong</span><span class="lang-bi">Wrong</span>
+                            </div>
+                        </div>
+                        <div class="bg-slate-100 border border-slate-200 p-3 rounded-xl">
+                            <div class="text-2xl font-black text-slate-700" id="stat-remaining">30</div>
+                            <div class="text-[11px] font-bold text-slate-600 uppercase mt-0.5">
+                                <span class="lang-id">Sisa</span><span class="lang-en hidden">Left</span><span class="lang-bi">Left</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Complete Quiz Button -->
+                    <button onclick="finishQuiz()" id="finish-btn" class="w-full mt-4 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold py-3 px-4 rounded-xl transition shadow-lg shadow-emerald-200 text-sm flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-flag-checkered"></i>
+                        <span>
+                            <span class="lang-id">Selesaikan & Lihat Hasil</span><span class="lang-en hidden">Finish Quiz & Results</span><span class="lang-bi">Finish & View Results</span>
+                        </span>
+                    </button>
+                </div>
+
+                <!-- Question Navigation Palette (1 - 30) -->
+                <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-extrabold text-slate-800 text-sm uppercase tracking-wider">
+                            <span class="lang-id">Navigasi Soal</span><span class="lang-en hidden">Question Navigation</span><span class="lang-bi">Navigasi Soal (1-30)</span>
+                        </h3>
+                        <span class="text-xs bg-indigo-50 text-indigo-700 font-bold px-2 py-0.5 rounded">
+                            <span id="answered-count-badge">0</span>/30
+                        </span>
+                    </div>
+
+                    <!-- Legend -->
+                    <div class="flex items-center justify-between text-[11px] font-semibold text-slate-500 mb-4 pb-3 border-b border-slate-100">
+                        <div class="flex items-center space-x-1">
+                            <span class="w-3 h-3 rounded-full bg-emerald-500 inline-block"></span>
+                            <span>Benar</span>
+                        </div>
+                        <div class="flex items-center space-x-1">
+                            <span class="w-3 h-3 rounded-full bg-rose-500 inline-block"></span>
+                            <span>Salah</span>
+                        </div>
+                        <div class="flex items-center space-x-1">
+                            <span class="w-3 h-3 rounded-full bg-slate-200 border border-slate-300 inline-block"></span>
+                            <span>Belum</span>
+                        </div>
+                    </div>
+
+                    <!-- 30 Button Grid -->
+                    <div class="grid grid-cols-5 gap-2 max-h-[320px] overflow-y-auto pr-1 custom-scroll" id="nav-palette-grid">
+                        <!-- Injected dynamically 1..30 -->
+                    </div>
+                </div>
+
+                <!-- Persistence Notice -->
+                <div class="bg-indigo-50 border border-indigo-100 p-4 rounded-2xl text-xs text-indigo-900 flex items-start space-x-2.5">
+                    <i class="fa-solid fa-shield-halved text-indigo-600 text-base mt-0.5 shrink-0"></i>
+                    <div>
+                        <span class="font-bold">Auto-Save Active:</span> Jawaban kamu tersimpan otomatis di perangkat ini. Jika koneksi terputus atau halaman ter-reload, progres tidak akan hilang!
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Modal: Results Summary -->
+    <div id="results-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl max-w-lg w-full p-6 md:p-8 shadow-2xl border border-slate-100 text-center relative overflow-hidden animate-fade-in">
+            <div class="absolute top-0 left-0 right-0 h-3 bg-gradient-to-r from-indigo-500 via-purple-500 to-emerald-500"></div>
+
+            <div class="w-20 h-20 bg-indigo-100 text-indigo-600 rounded-3xl flex items-center justify-center text-4xl mx-auto mb-4 shadow-inner" id="result-icon">
+                🏆
+            </div>
+
+            <h2 class="text-2xl md:text-3xl font-black text-slate-800 mb-1" id="result-title">
+                Hasil Quiz Kamu!
+            </h2>
+            <p class="text-xs md:text-sm text-slate-500 font-bold mb-6" id="result-subtitle">
+                30 Soal Operasi Aljabar & PLSV 1-2 Langkah
+            </p>
+
+            <!-- Score Badge -->
+            <div class="bg-slate-50 border-2 border-indigo-100 rounded-2xl p-5 mb-6">
+                <div class="text-xs font-extrabold text-slate-400 uppercase tracking-widest mb-1">SKOR AKHIR / FINAL SCORE</div>
+                <div class="text-5xl font-black text-indigo-600" id="final-score-val">0</div>
+                <div class="text-xs font-bold text-slate-500 mt-2" id="final-score-detail">
+                    Benar: 0 | Salah: 0 | Nilai: 0%
+                </div>
+            </div>
+
+            <!-- Topic Performance Breakdown -->
+            <div class="space-y-2 text-left mb-6 text-xs font-bold">
+                <div class="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+                    <span class="text-slate-700">1. Operasi Aljabar (Soal 1-10)</span>
+                    <span id="breakdown-aljabar" class="text-indigo-600 font-black">0/10</span>
+                </div>
+                <div class="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+                    <span class="text-slate-700">2. PLSV 1 Langkah (Soal 11-20)</span>
+                    <span id="breakdown-plsv1" class="text-indigo-600 font-black">0/10</span>
+                </div>
+                <div class="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+                    <span class="text-slate-700">3. PLSV 2 Langkah (Soal 21-30)</span>
+                    <span id="breakdown-plsv2" class="text-indigo-600 font-black">0/10</span>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex space-x-3">
+                <button onclick="closeModal('results-modal')" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-extrabold py-3 rounded-xl transition text-sm">
+                    Tinjau Jawaban
+                </button>
+                <button onclick="confirmResetQuiz()" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold py-3 rounded-xl transition text-sm shadow-md">
+                    Coba Lagi 🔄
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="mt-12 bg-slate-900 text-slate-400 text-center py-6 text-xs font-medium border-t border-slate-800">
+        <div class="max-w-6xl mx-auto px-4">
+            <p>Mastering Algebraic Operations & Linear Equations (PLSV) • Bilingual Cambridge & Kurikulum Merdeka</p>
+            <p class="mt-1 text-slate-500">© 2026 Interactive Learning Module • Data Auto-Saved Locally</p>
+        </div>
+    </footer>
+
+    <script>
+        const STORAGE_KEY = 'plsv_30_quiz_state_v3';
+        let currentLang = 'bi'; // 'id', 'en', 'bi'
+        let currentQIndex = 0;
+
+        // User State: { qIndex: { chosenOpt: number, isCorrect: boolean } }
+        let userAnswers = {};
+
+        const questionsData = [
+            // =========================================================================
+            // TOPIC 1: OPERASI ALJABAR (Q1 - Q10)
+            // =========================================================================
+            {
+                id: 1,
+                topic: "Operasi Aljabar / Algebra",
+                prompt: {
+                    id: "Sederhanakan bentuk aljabar berikut dengan menjumlahkan suku-suku sejenis:",
+                    en: "Simplify the following algebraic expression by combining like terms:",
+                    bi: "Sederhanakan bentuk aljabar berikut / Simplify the algebraic expression:"
+                },
+                math: "3x + 5x - 2x",
+                options: [
+                    { label: "10x", val: 0 },
+                    { label: "6x", val: 1 },
+                    { label: "6x²", val: 2 },
+                    { label: "8x", val: 3 }
+                ],
+                correct: 1, // B (6x)
+                explain: {
+                    id: "Suku-suku tersebut sejenis (semua memiliki variabel x). $3x + 5x - 2x = (3 + 5 - 2)x = 6x$.",
+                    en: "These are like terms. $3x + 5x - 2x = (3 + 5 - 2)x = 6x$."
+                }
+            },
+            {
+                id: 2,
+                topic: "Operasi Aljabar / Algebra",
+                prompt: {
+                    id: "Penjabaran dari bentuk $4(2a + 3)$ menggunakan sifat distributif adalah:",
+                    en: "Expand $4(2a + 3)$ using the distributive property:",
+                    bi: "Penjabaran dari / Expand: $4(2a + 3)$"
+                },
+                math: "4(2a + 3)",
+                options: [
+                    { label: "8a + 3", val: 0 },
+                    { label: "6a + 12", val: 1 },
+                    { label: "8a + 7", val: 2 },
+                    { label: "8a + 12", val: 3 }
+                ],
+                correct: 3, // D (8a + 12)
+                explain: {
+                    id: "Kalikan 4 ke setiap suku di dalam kurung: $4 \\times 2a + 4 \\times 3 = 8a + 12$.",
+                    en: "Multiply 4 to each term inside brackets: $4 \\times 2a + 4 \\times 3 = 8a + 12$."
+                }
+            },
+            {
+                id: 3,
+                topic: "Operasi Aljabar / Algebra",
+                prompt: {
+                    id: "Jika $x = 3$, hitunglah nilai dari bentuk aljabar berikut:",
+                    en: "If $x = 3$, calculate the value of the algebraic expression:",
+                    bi: "Jika $x = 3$, hitung nilai dari / If $x = 3$, evaluate:"
+                },
+                math: "2x^2 + 5",
+                options: [
+                    { label: "23", val: 0 },
+                    { label: "17", val: 1 },
+                    { label: "41", val: 2 },
+                    { label: "29", val: 3 }
+                ],
+                correct: 0, // A (23)
+                explain: {
+                    id: "Substitusi $x = 3$: $2(3)^2 + 5 = 2(9) + 5 = 18 + 5 = 23$.",
+                    en: "Substitute $x = 3$: $2(3)^2 + 5 = 2(9) + 5 = 18 + 5 = 23$."
+                }
+            },
+            {
+                id: 4,
+                topic: "Operasi Aljabar / Algebra",
+                prompt: {
+                    id: "Hasil penjumlahan dari $(5m + 3n) + (2m - 7n)$ adalah:",
+                    en: "The sum of $(5m + 3n) + (2m - 7n)$ is:",
+                    bi: "Sederhanakan / Simplify: $(5m + 3n) + (2m - 7n)$"
+                },
+                math: "(5m + 3n) + (2m - 7n)",
+                options: [
+                    { label: "7m + 10n", val: 0 },
+                    { label: "10m - 4n", val: 1 },
+                    { label: "7m - 4n", val: 2 },
+                    { label: "3m - 4n", val: 3 }
+                ],
+                correct: 2, // C (7m - 4n)
+                explain: {
+                    id: "Kelompokkan suku sejenis: $(5m + 2m) + (3n - 7n) = 7m - 4n$.",
+                    en: "Group like terms: $(5m + 2m) + (3n - 7n) = 7m - 4n$."
+                }
+            },
+            {
+                id: 5,
+                topic: "Operasi Aljabar / Algebra",
+                prompt: {
+                    id: "Hasil perkalian dari $(3p - 2) \\times 4$ adalah:",
+                    en: "Expand the expression $(3p - 2) \\times 4$:",
+                    bi: "Hasil perkalian / Expand: $(3p - 2) \\times 4$"
+                },
+                math: "4(3p - 2)",
+                options: [
+                    { label: "12p - 8", val: 0 },
+                    { label: "12p - 2", val: 1 },
+                    { label: "7p - 8", val: 2 },
+                    { label: "12p + 8", val: 3 }
+                ],
+                correct: 0, // A (12p - 8)
+                explain: {
+                    id: "$4 \\times 3p - 4 \\times 2 = 12p - 8$.",
+                    en: "$4 \\times 3p - 4 \\times 2 = 12p - 8$."
+                }
+            },
+            {
+                id: 6,
+                topic: "Operasi Aljabar / Algebra",
+                prompt: {
+                    id: "Sederhanakan bentuk berikut: $10k - 3(2k - 4)$",
+                    en: "Simplify the following expression: $10k - 3(2k - 4)$",
+                    bi: "Sederhanakan / Simplify: $10k - 3(2k - 4)$"
+                },
+                math: "10k - 3(2k - 4)",
+                options: [
+                    { label: "4k - 12", val: 0 },
+                    { label: "16k + 12", val: 1 },
+                    { label: "4k + 12", val: 2 },
+                    { label: "8k - 12", val: 3 }
+                ],
+                correct: 2, // C (4k + 12)
+                explain: {
+                    id: "Jabarkan kurung: $-3 \\times 2k = -6k$ dan $-3 \\times (-4) = +12$. Maka $10k - 6k + 12 = 4k + 12$.",
+                    en: "Expand: $-3 \\times 2k = -6k$ and $-3 \\times (-4) = +12$. So $10k - 6k + 12 = 4k + 12$."
+                }
+            },
+            {
+                id: 7,
+                topic: "Operasi Aljabar / Algebra",
+                prompt: {
+                    id: "Bentuk aljabar dari kalimat '5 lebihnya dari 3 kali n' adalah:",
+                    en: "The algebraic expression for '5 more than 3 times n' is:",
+                    bi: "Nyatakan dalam aljabar / Express algebraically: '5 lebihnya dari 3 kali n'"
+                },
+                math: "\\text{5 more than 3 times } n",
+                options: [
+                    { label: "5n + 3", val: 0 },
+                    { label: "3n + 5", val: 1 },
+                    { label: "3(n + 5)", val: 2 },
+                    { label: "15n", val: 3 }
+                ],
+                correct: 1, // B (3n + 5)
+                explain: {
+                    id: "'3 kali n' artinya $3n$. '5 lebihnya' artinya ditambah 5, sehingga menjadi $3n + 5$.",
+                    en: "'3 times n' means $3n$. '5 more than' means add 5, resulting in $3n + 5$."
+                }
+            },
+            {
+                id: 8,
+                topic: "Operasi Aljabar / Algebra",
+                prompt: {
+                    id: "Jika $a = -2$ dan $b = 5$, berapakah nilai dari $3a + 2b$?",
+                    en: "If $a = -2$ and $b = 5$, what is the value of $3a + 2b$?",
+                    bi: "Jika $a = -2, b = 5$, hitung / Evaluate: $3a + 2b$"
+                },
+                math: "3a + 2b \\quad (a = -2, b = 5)",
+                options: [
+                    { label: "-16", val: 0 },
+                    { label: "16", val: 1 },
+                    { label: "-4", val: 2 },
+                    { label: "4", val: 3 }
+                ],
+                correct: 3, // D (4)
+                explain: {
+                    id: "Substitusi nilai: $3(-2) + 2(5) = -6 + 10 = 4$.",
+                    en: "Substitute values: $3(-2) + 2(5) = -6 + 10 = 4$."
+                }
+            },
+            {
+                id: 9,
+                topic: "Operasi Aljabar / Algebra",
+                prompt: {
+                    id: "Sederhanakan pembagian aljabar berikut: $\\frac{12x^2 y}{4x}$",
+                    en: "Simplify the algebraic division: $\\frac{12x^2 y}{4x}$",
+                    bi: "Sederhanakan pembagian / Simplify division: $\\frac{12x^2 y}{4x}$"
+                },
+                math: "\\frac{12x^2 y}{4x}",
+                options: [
+                    { label: "3x", val: 0 },
+                    { label: "3xy", val: 1 },
+                    { label: "8xy", val: 2 },
+                    { label: "3y", val: 3 }
+                ],
+                correct: 1, // B (3xy)
+                explain: {
+                    id: "Bagi koefisien $\\frac{12}{4} = 3$. Bagi variabel $\\frac{x^2}{x} = x$. Variabel $y$ tetap. Hasil: $3xy$.",
+                    en: "Divide coefficients $\\frac{12}{4} = 3$. Divide variables $\\frac{x^2}{x} = x$. Variable $y$ remains. Result: $3xy$."
+                }
+            },
+            {
+                id: 10,
+                topic: "Operasi Aljabar / Algebra",
+                prompt: {
+                    id: "Kurangkan $(2x - 5)$ dari $(6x + 3)$:",
+                    en: "Subtract $(2x - 5)$ from $(6x + 3)$:",
+                    bi: "Kurangkan / Subtract $(2x - 5)$ from $(6x + 3)$"
+                },
+                math: "(6x + 3) - (2x - 5)",
+                options: [
+                    { label: "4x - 2", val: 0 },
+                    { label: "8x - 2", val: 1 },
+                    { label: "4x + 8", val: 2 },
+                    { label: "4x - 8", val: 3 }
+                ],
+                correct: 2, // C (4x + 8)
+                explain: {
+                    id: "'Kurangkan A dari B' berarti $B - A$: $(6x + 3) - (2x - 5) = 6x + 3 - 2x + 5 = 4x + 8$.",
+                    en: "'Subtract A from B' means $B - A$: $(6x + 3) - (2x - 5) = 6x + 3 - 2x + 5 = 4x + 8$."
+                }
+            },
+
+            // =========================================================================
+            // TOPIC 2: PLSV 1 LANGKAH (Q11 - Q20)
+            // =========================================================================
+            {
+                id: 11,
+                topic: "PLSV 1 Langkah / 1-Step Equation",
+                prompt: {
+                    id: "Tentukan nilai $x$ yang memenuhi persamaan 1 langkah berikut:",
+                    en: "Find the value of $x$ for the following 1-step linear equation:",
+                    bi: "Selesaikan persamaan / Solve for $x$:"
+                },
+                math: "x + 9 = 15",
+                options: [
+                    { label: "x = 6", val: 0 },
+                    { label: "x = 24", val: 1 },
+                    { label: "x = -6", val: 2 },
+                    { label: "x = 135", val: 3 }
+                ],
+                correct: 0, // A (x = 6)
+                explain: {
+                    id: "Gunakan operasi kebalikan (inverse operation). Kurangi kedua ruas dengan 9: $x = 15 - 9 = 6$.",
+                    en: "Use inverse operations. Subtract 9 from both sides: $x = 15 - 9 = 6$."
+                }
+            },
+            {
+                id: 12,
+                topic: "PLSV 1 Langkah / 1-Step Equation",
+                prompt: {
+                    id: "Selesaikan persamaan berikut untuk mencari nilai $y$:",
+                    en: "Solve the following equation to find the value of $y$:",
+                    bi: "Cari nilai $y$ / Solve for $y$:"
+                },
+                math: "y - 7 = 12",
+                options: [
+                    { label: "y = 5", val: 0 },
+                    { label: "y = -5", val: 1 },
+                    { label: "y = 19", val: 2 },
+                    { label: "y = 84", val: 3 }
+                ],
+                correct: 2, // C (y = 19)
+                explain: {
+                    id: "Kebalikan dari $-7$ adalah $+7$. Tambahkan 7 pada kedua ruas: $y = 12 + 7 = 19$.",
+                    en: "The inverse of $-7$ is $+7$. Add 7 to both sides: $y = 12 + 7 = 19$."
+                }
+            },
+            {
+                id: 13,
+                topic: "PLSV 1 Langkah / 1-Step Equation",
+                prompt: {
+                    id: "Tentukan nilai $k$ dari persamaan perkalian berikut:",
+                    en: "Determine the value of $k$ from the multiplication equation:",
+                    bi: "Selesaikan / Solve for $k$:"
+                },
+                math: "4k = 28",
+                options: [
+                    { label: "k = 112", val: 0 },
+                    { label: "k = 7", val: 1 },
+                    { label: "k = 24", val: 2 },
+                    { label: "k = 32", val: 3 }
+                ],
+                correct: 1, // B (k = 7)
+                explain: {
+                    id: "Bagi kedua ruas dengan koefisien 4: $k = \\frac{28}{4} = 7$.",
+                    en: "Divide both sides by the coefficient 4: $k = \\frac{28}{4} = 7$."
+                }
+            },
+            {
+                id: 14,
+                topic: "PLSV 1 Langkah / 1-Step Equation",
+                prompt: {
+                    id: "Berapakah nilai $m$ dari persamaan pembagian berikut?",
+                    en: "What is the value of $m$ in the following division equation?",
+                    bi: "Selesaikan / Solve for $m$:"
+                },
+                math: "\\frac{m}{5} = 6",
+                options: [
+                    { label: "m = 1.2", val: 0 },
+                    { label: "m = 11", val: 1 },
+                    { label: "m = 30/5", val: 2 },
+                    { label: "m = 30", val: 3 }
+                ],
+                correct: 3, // D (m = 30)
+                explain: {
+                    id: "Kebalikan dari bagi 5 adalah kali 5. Kalikan kedua ruas dengan 5: $m = 6 \\times 5 = 30$.",
+                    en: "The inverse of dividing by 5 is multiplying by 5. Multiply both sides by 5: $m = 6 \\times 5 = 30$."
+                }
+            },
+            {
+                id: 15,
+                topic: "PLSV 1 Langkah / 1-Step Equation",
+                prompt: {
+                    id: "Selesaikan persamaan dengan koefisien negatif berikut:",
+                    en: "Solve the linear equation with negative coefficient:",
+                    bi: "Selesaikan / Solve for $p$:"
+                },
+                math: "-3p = 18",
+                options: [
+                    { label: "p = -6", val: 0 },
+                    { label: "p = 6", val: 1 },
+                    { label: "p = -21", val: 2 },
+                    { label: "p = -54", val: 3 }
+                ],
+                correct: 0, // A (p = -6)
+                explain: {
+                    id: "Bagi kedua ruas dengan $-3$: $p = \\frac{18}{-3} = -6$.",
+                    en: "Divide both sides by $-3$: $p = \\frac{18}{-3} = -6$."
+                }
+            },
+            {
+                id: 16,
+                topic: "PLSV 1 Langkah / 1-Step Equation",
+                prompt: {
+                    id: "Tentukan nilai $x$ jika hasil di ruas kanan lebih kecil:",
+                    en: "Find $x$ when the right-hand side constant is smaller:",
+                    bi: "Selesaikan / Solve for $x$:"
+                },
+                math: "x + 15 = 4",
+                options: [
+                    { label: "x = 19", val: 0 },
+                    { label: "x = 11", val: 1 },
+                    { label: "x = -11", val: 2 },
+                    { label: "x = -60", val: 3 }
+                ],
+                correct: 2, // C (x = -11)
+                explain: {
+                    id: "Kurangi kedua ruas dengan 15: $x = 4 - 15 = -11$.",
+                    en: "Subtract 15 from both sides: $x = 4 - 15 = -11$."
+                }
+            },
+            {
+                id: 17,
+                topic: "PLSV 1 Langkah / 1-Step Equation",
+                prompt: {
+                    id: "Selesaikan persamaan dengan tanda ganda berikut:",
+                    en: "Solve the equation involving double negative signs:",
+                    bi: "Selesaikan / Solve for $w$:"
+                },
+                math: "w - (-3) = 10",
+                options: [
+                    { label: "w = 13", val: 0 },
+                    { label: "w = 7", val: 1 },
+                    { label: "w = -7", val: 2 },
+                    { label: "w = 30", val: 3 }
+                ],
+                correct: 1, // B (w = 7)
+                explain: {
+                    id: "Ingat $w - (-3)$ sama dengan $w + 3$. Maka $w + 3 = 10 \\implies w = 10 - 3 = 7$.",
+                    en: "Remember $w - (-3)$ is equal to $w + 3$. Thus $w + 3 = 10 \\implies w = 10 - 3 = 7$."
+                }
+            },
+            {
+                id: 18,
+                topic: "PLSV 1 Langkah / 1-Step Equation",
+                prompt: {
+                    id: "Selesaikan persamaan pecahan 1 langkah berikut:",
+                    en: "Solve the fractional 1-step linear equation:",
+                    bi: "Selesaikan / Solve for $x$:"
+                },
+                math: "\\frac{2}{3}x = 8",
+                options: [
+                    { label: "x = 16/3", val: 0 },
+                    { label: "x = 24", val: 1 },
+                    { label: "x = 5.33", val: 2 },
+                    { label: "x = 12", val: 3 }
+                ],
+                correct: 3, // D (x = 12)
+                explain: {
+                    id: "Kalikan kedua ruas dengan kebalikan pecahan $\\frac{3}{2}$: $x = 8 \\times \\frac{3}{2} = 12$.",
+                    en: "Multiply both sides by reciprocal fraction $\\frac{3}{2}$: $x = 8 \\times \\frac{3}{2} = 12$."
+                }
+            },
+            {
+                id: 19,
+                topic: "PLSV 1 Langkah / 1-Step Equation",
+                prompt: {
+                    id: "Cari nilai $n$ dari persamaan berikut:",
+                    en: "Find the value of $n$ from the following equation:",
+                    bi: "Selesaikan / Solve for $n$:"
+                },
+                math: "-5 + n = 11",
+                options: [
+                    { label: "n = 16", val: 0 },
+                    { label: "n = 6", val: 1 },
+                    { label: "n = -16", val: 2 },
+                    { label: "n = -55", val: 3 }
+                ],
+                correct: 0, // A (n = 16)
+                explain: {
+                    id: "Pindahkan $-5$ ke ruas kanan menjadi $+5$: $n = 11 + 5 = 16$.",
+                    en: "Shift $-5$ to RHS as $+5$: $n = 11 + 5 = 16$."
+                }
+            },
+            {
+                id: 20,
+                topic: "PLSV 1 Langkah / 1-Step Equation",
+                prompt: {
+                    id: "Tentukan nilai $y$ pada posisi variabel di ruas kanan:",
+                    en: "Determine $y$ when the variable is positioned on the right-hand side:",
+                    bi: "Selesaikan / Solve for $y$:"
+                },
+                math: "14 = 2y",
+                options: [
+                    { label: "y = 28", val: 0 },
+                    { label: "y = 12", val: 1 },
+                    { label: "y = 7", val: 2 },
+                    { label: "y = 16", val: 3 }
+                ],
+                correct: 2, // C (y = 7)
+                explain: {
+                    id: "Bagi kedua ruas dengan koefisien 2: $y = \\frac{14}{2} = 7$.",
+                    en: "Divide both sides by coefficient 2: $y = \\frac{14}{2} = 7$."
+                }
+            },
+
+            // =========================================================================
+            // TOPIC 3: PLSV 2 LANGKAH & VARIABEL 2 RUAS (Q21 - Q30)
+            // =========================================================================
+            {
+                id: 21,
+                topic: "PLSV 2 Langkah / 2-Step Equation",
+                prompt: {
+                    id: "Selesaikan persamaan 2 langkah standar berikut:",
+                    en: "Solve the standard 2-step linear equation:",
+                    bi: "Selesaikan persamaan 2 langkah / Solve 2-step equation:"
+                },
+                math: "2x + 5 = 17",
+                options: [
+                    { label: "x = 11", val: 0 },
+                    { label: "x = 6", val: 1 },
+                    { label: "x = 8.5", val: 2 },
+                    { label: "x = 22", val: 3 }
+                ],
+                correct: 1, // B (x = 6)
+                explain: {
+                    id: "Langkah 1 (Kurangi 5): $2x = 17 - 5 = 12$.<br>Langkah 2 (Bagi 2): $x = \\frac{12}{2} = 6$.",
+                    en: "Step 1 (Subtract 5): $2x = 17 - 5 = 12$.<br>Step 2 (Divide by 2): $x = \\frac{12}{2} = 6$."
+                }
+            },
+            {
+                id: 22,
+                topic: "PLSV 2 Langkah / 2-Step Equation",
+                prompt: {
+                    id: "Tentukan nilai $y$ dari persamaan 2 langkah pengurangan berikut:",
+                    en: "Solve for $y$ in the subtraction 2-step equation:",
+                    bi: "Selesaikan / Solve for $y$:"
+                },
+                math: "3y - 4 = 14",
+                options: [
+                    { label: "y = 3.33", val: 0 },
+                    { label: "y = 10", val: 1 },
+                    { label: "y = 18", val: 2 },
+                    { label: "y = 6", val: 3 }
+                ],
+                correct: 3, // D (y = 6)
+                explain: {
+                    id: "Langkah 1 (Tambah 4): $3y = 14 + 4 = 18$.<br>Langkah 2 (Bagi 3): $y = \\frac{18}{3} = 6$.",
+                    en: "Step 1 (Add 4): $3y = 14 + 4 = 18$.<br>Step 2 (Divide by 3): $y = \\frac{18}{3} = 6$."
+                }
+            },
+            {
+                id: 23,
+                topic: "PLSV 2 Langkah / 2-Step Equation",
+                prompt: {
+                    id: "Cari nilai $n$ dari persamaan berikut:",
+                    en: "Find the value of $n$ in the equation:",
+                    bi: "Selesaikan / Solve for $n$:"
+                },
+                math: "5n + 8 = 38",
+                options: [
+                    { label: "n = 6", val: 0 },
+                    { label: "n = 9.2", val: 1 },
+                    { label: "n = 25", val: 2 },
+                    { label: "n = 10", val: 3 }
+                ],
+                correct: 0, // A (n = 6)
+                explain: {
+                    id: "Langkah 1: $5n = 38 - 8 = 30$.<br>Langkah 2: $n = \\frac{30}{5} = 6$.",
+                    en: "Step 1: $5n = 38 - 8 = 30$.<br>Step 2: $n = \\frac{30}{5} = 6$."
+                }
+            },
+            {
+                id: 24,
+                topic: "PLSV Variabel Kedua Ruas / Both Sides",
+                prompt: {
+                    id: "Selesaikan persamaan dengan variabel di kedua ruas (Collect Like Terms):",
+                    en: "Solve the equation with variables on both sides (Collect Like Terms):",
+                    bi: "Variabel di kedua ruas / Variables on both sides:"
+                },
+                math: "4x - 3 = 2x + 7",
+                options: [
+                    { label: "x = 2", val: 0 },
+                    { label: "x = 10", val: 1 },
+                    { label: "x = 5", val: 2 },
+                    { label: "x = 2.5", val: 3 }
+                ],
+                correct: 2, // C (x = 5)
+                explain: {
+                    id: "Langkah 1 (Kumpulkan suku $x$): $4x - 2x - 3 = 7 \\implies 2x - 3 = 7$.<br>Langkah 2 (Pindahkan konstanta): $2x = 7 + 3 = 10$.<br>Langkah 3 (Isolate $x$): $x = \\frac{10}{2} = 5$.",
+                    en: "Step 1 (Collect $x$ terms): $4x - 2x - 3 = 7 \\implies 2x - 3 = 7$.<br>Step 2 (Collect constants): $2x = 7 + 3 = 10$.<br>Step 3 (Divide): $x = \\frac{10}{2} = 5$."
+                }
+            },
+            {
+                id: 25,
+                topic: "PLSV Variabel Kedua Ruas / Both Sides",
+                prompt: {
+                    id: "Tentukan nilai $p$ dari persamaan berikut:",
+                    en: "Determine the value of $p$:",
+                    bi: "Selesaikan / Solve for $p$:"
+                },
+                math: "6p + 2 = 3p + 20",
+                options: [
+                    { label: "p = 22/9", val: 0 },
+                    { label: "p = 6", val: 1 },
+                    { label: "p = 18", val: 2 },
+                    { label: "p = 3", val: 3 }
+                ],
+                correct: 1, // B (p = 6)
+                explain: {
+                    id: "Kumpulkan variabel ke kiri: $6p - 3p = 20 - 2 \\implies 3p = 18$.<br>Bagi dengan 3: $p = \\frac{18}{3} = 6$.",
+                    en: "Collect variables to LHS: $6p - 3p = 20 - 2 \\implies 3p = 18$.<br>Divide by 3: $p = \\frac{18}{3} = 6$."
+                }
+            },
+            {
+                id: 26,
+                topic: "PLSV dengan Tanda Kurung / Brackets",
+                prompt: {
+                    id: "Selesaikan persamaan yang memiliki tanda kurung berikut:",
+                    en: "Solve the linear equation involving brackets:",
+                    bi: "Selesaikan / Solve for $a$:"
+                },
+                math: "2(a + 4) = 18",
+                options: [
+                    { label: "a = 7", val: 0 },
+                    { label: "a = 13", val: 1 },
+                    { label: "a = 9", val: 2 },
+                    { label: "a = 5", val: 3 }
+                ],
+                correct: 3, // D (a = 5)
+                explain: {
+                    id: "Metode 1 (Jabarkan): $2a + 8 = 18 \\implies 2a = 10 \\implies a = 5$.<br>Metode 2 (Bagi 2 dulu): $a + 4 = 9 \\implies a = 5$.",
+                    en: "Method 1 (Expand): $2a + 8 = 18 \\implies 2a = 10 \\implies a = 5$.<br>Method 2 (Divide by 2 first): $a + 4 = 9 \\implies a = 5$."
+                }
+            },
+            {
+                id: 27,
+                topic: "PLSV Bentuk Pecahan / Fractional PLSV",
+                prompt: {
+                    id: "Cari nilai $x$ dari persamaan berbentuk pembagian berikut:",
+                    en: "Find $x$ in the algebraic fractional equation:",
+                    bi: "Selesaikan / Solve for $x$:"
+                },
+                math: "\\frac{x + 3}{2} = 8",
+                options: [
+                    { label: "x = 13", val: 0 },
+                    { label: "x = 11", val: 1 },
+                    { label: "x = 19", val: 2 },
+                    { label: "x = 16", val: 3 }
+                ],
+                correct: 0, // A (x = 13)
+                explain: {
+                    id: "Langkah 1 (Kalikan 2 ke RHS): $x + 3 = 8 \\times 2 = 16$.<br>Langkah 2 (Kurangi 3): $x = 16 - 3 = 13$.",
+                    en: "Step 1 (Multiply by 2): $x + 3 = 8 \\times 2 = 16$.<br>Step 2 (Subtract 3): $x = 16 - 3 = 13$."
+                }
+            },
+            {
+                id: 28,
+                topic: "Studi Kasus Kontekstual / Word Problem",
+                prompt: {
+                    id: "Budi membeli 3 buku tulis dengan harga sama dan 1 pensil seharga Rp2.000. Total belanjanya Rp17.000. Berapakah harga 1 buku tulis ($x$)?",
+                    en: "Budi buys 3 notebooks of equal price and 1 pencil for Rp2,000. The total cost is Rp17,000. What is the price of 1 notebook ($x$)?",
+                    bi: "3 buku tulis + Rp2.000 pensil = Rp17.000. Berapa harga 1 buku ($x$)?"
+                },
+                math: "3x + 2000 = 17000",
+                options: [
+                    { label: "Rp 4.000", val: 0 },
+                    { label: "Rp 6.000", val: 1 },
+                    { label: "Rp 5.000", val: 2 },
+                    { label: "Rp 15.000", val: 3 }
+                ],
+                correct: 2, // C (Rp 5.000)
+                explain: {
+                    id: "Model PLSV: $3x + 2000 = 17000$.<br>Kurangi Rp2.000: $3x = 15000$.<br>Bagi 3: $x = 5000$. Jadi harga 1 buku adalah Rp5.000.",
+                    en: "Model: $3x + 2000 = 17000$.<br>Subtract 2000: $3x = 15000$.<br>Divide by 3: $x = 5000$. Price per notebook = Rp5,000."
+                }
+            },
+            {
+                id: 29,
+                topic: "PLSV Variabel Kedua Ruas / Both Sides",
+                prompt: {
+                    id: "Selesaikan persamaan berikut untuk mencari $k$:",
+                    en: "Solve the equation to find $k$:",
+                    bi: "Selesaikan / Solve for $k$:"
+                },
+                math: "7k - 5 = 4k + 10",
+                options: [
+                    { label: "k = 15", val: 0 },
+                    { label: "k = 3", val: 1 },
+                    { label: "k = 1.36", val: 2 },
+                    { label: "k = 5", val: 3 }
+                ],
+                correct: 3, // D (k = 5)
+                explain: {
+                    id: "Kumpulkan $k$: $7k - 4k = 10 + 5 \\implies 3k = 15$.<br>Bagi 3: $k = \\frac{15}{3} = 5$.",
+                    en: "Collect $k$: $7k - 4k = 10 + 5 \\implies 3k = 15$.<br>Divide by 3: $k = \\frac{15}{3} = 5$."
+                }
+            },
+            {
+                id: 30,
+                topic: "PLSV Kurung & Variabel 2 Ruas",
+                prompt: {
+                    id: "Selesaikan persamaan gabungan berikut:",
+                    en: "Solve the combined linear equation:",
+                    bi: "Selesaikan / Solve for $x$:"
+                },
+                math: "5(x - 2) = 3x + 6",
+                options: [
+                    { label: "x = 16", val: 0 },
+                    { label: "x = 8", val: 1 },
+                    { label: "x = -2", val: 2 },
+                    { label: "x = 4", val: 3 }
+                ],
+                correct: 1, // B (x = 8)
+                explain: {
+                    id: "Jabarkan kurung dulu: $5x - 10 = 3x + 6$.<br>Pindahkan variabel: $5x - 3x = 6 + 10 \\implies 2x = 16$.<br>Bagi 2: $x = 8$.",
+                    en: "Expand bracket first: $5x - 10 = 3x + 6$.<br>Collect terms: $5x - 3x = 6 + 10 \\implies 2x = 16$.<br>Divide by 2: $x = 8$."
+                }
+            }
+        ];
+
+        function loadSavedState() {
+            try {
+                const saved = localStorage.getItem(STORAGE_KEY);
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    userAnswers = parsed.userAnswers || {};
+                    currentQIndex = parsed.currentQIndex || 0;
+                    currentLang = parsed.currentLang || 'bi';
+                }
+            } catch (e) {
+                console.error("Failed to load local storage:", e);
+            }
+        }
+
+        function saveState() {
+            try {
+                const state = {
+                    userAnswers,
+                    currentQIndex,
+                    currentLang
+                };
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+            } catch (e) {
+                console.error("Failed to save state:", e);
+            }
+        }
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`lang-btn-${lang}`).classList.add('active');
+
+            if (lang === 'id') {
+                document.querySelectorAll('.lang-id').forEach(el => el.classList.remove('hidden'));
+                document.querySelectorAll('.lang-en').forEach(el => el.classList.add('hidden'));
+                document.querySelectorAll('.lang-bi').forEach(el => el.classList.add('hidden'));
+            } else if (lang === 'en') {
+                document.querySelectorAll('.lang-id').forEach(el => el.classList.add('hidden'));
+                document.querySelectorAll('.lang-en').forEach(el => el.classList.remove('hidden'));
+                document.querySelectorAll('.lang-bi').forEach(el => el.classList.add('hidden'));
+            } else { // Bilingual
+                document.querySelectorAll('.lang-id').forEach(el => el.classList.add('hidden'));
+                document.querySelectorAll('.lang-en').forEach(el => el.classList.add('hidden'));
+                document.querySelectorAll('.lang-bi').forEach(el => el.classList.remove('hidden'));
+            }
+
+            renderCurrentQuestion();
+            saveState();
+        }
+
+        // Trigger KaTeX rendering safely
+        function renderMath() {
+            if (typeof renderMathInElement === 'function') {
+                renderMathInElement(document.body, {
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '$', right: '$', display: false}
+                    ],
+                    throwOnError: false
+                });
+            }
+        }
+
+        function renderNavPalette() {
+            const grid = document.getElementById('nav-palette-grid');
+            grid.innerHTML = '';
+
+            for (let i = 0; i < questionsData.length; i++) {
+                const btn = document.createElement('button');
+                btn.className = `nav-num h-11 rounded-xl text-xs font-bold transition flex items-center justify-center border border-slate-200 relative`;
+                btn.innerText = i + 1;
+
+                const ans = userAnswers[i];
+                if (ans !== undefined) {
+                    if (ans.isCorrect) {
+                        btn.classList.add('answered-correct');
+                    } else {
+                        btn.classList.add('answered-wrong');
+                    }
+                } else {
+                    btn.classList.add('bg-slate-100', 'text-slate-700', 'hover:bg-slate-200');
+                }
+
+                if (i === currentQIndex) {
+                    btn.classList.add('active-q');
+                }
+
+                btn.onclick = () => {
+                    currentQIndex = i;
+                    renderCurrentQuestion();
+                };
+
+                grid.appendChild(btn);
+            }
+
+            updateStats();
+        }
+
+        function updateStats() {
+            let correctCount = 0;
+            let wrongCount = 0;
+            let totalAnswered = 0;
+
+            for (let i = 0; i < questionsData.length; i++) {
+                if (userAnswers[i] !== undefined) {
+                    totalAnswered++;
+                    if (userAnswers[i].isCorrect) correctCount++;
+                    else wrongCount++;
+                }
+            }
+
+            const remaining = questionsData.length - totalAnswered;
+
+            document.getElementById('stat-correct').innerText = correctCount;
+            document.getElementById('stat-wrong').innerText = wrongCount;
+            document.getElementById('stat-remaining').innerText = remaining;
+            document.getElementById('answered-count-badge').innerText = totalAnswered;
+
+            // Fill Progress Bar
+            const percent = (totalAnswered / questionsData.length) * 100;
+            document.getElementById('progress-bar-fill').style.width = `${percent}%`;
+        }
+
+        function renderCurrentQuestion() {
+            const q = questionsData[currentQIndex];
+
+            // Topic & Header Info
+            document.getElementById('topic-badge').innerText = q.topic;
+            document.getElementById('current-q-num-text').innerText = currentQIndex + 1;
+            document.getElementById('q-number-pill').innerText = `Q${currentQIndex + 1}`;
+
+            // Status Badge
+            const statusBadge = document.getElementById('q-status-badge');
+            const ans = userAnswers[currentQIndex];
+
+            if (ans !== undefined) {
+                if (ans.isCorrect) {
+                    statusBadge.innerText = '✅ Correct / Benar';
+                    statusBadge.className = 'text-xs font-extrabold px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-800';
+                } else {
+                    statusBadge.innerText = '❌ Incorrect / Salah';
+                    statusBadge.className = 'text-xs font-extrabold px-2.5 py-1 rounded-lg bg-rose-100 text-rose-800';
+                }
+            } else {
+                statusBadge.innerText = 'Belum Diisi / Unanswered';
+                statusBadge.className = 'text-xs font-bold px-2.5 py-1 rounded-lg bg-slate-100 text-slate-500';
+            }
+
+            // Question Prompt Text based on Language
+            const promptBox = document.getElementById('question-text-box');
+            if (currentLang === 'id') promptBox.innerText = q.prompt.id;
+            else if (currentLang === 'en') promptBox.innerText = q.prompt.en;
+            else promptBox.innerText = `${q.prompt.id} / ${q.prompt.en}`;
+
+            // Math formula
+            document.getElementById('math-formula-box').innerHTML = `$${q.math}$`;
+
+            // Options Container
+            const optsContainer = document.getElementById('options-container');
+            optsContainer.innerHTML = '';
+
+            const optionLetters = ['A', 'B', 'C', 'D'];
+
+            q.options.forEach((opt, idx) => {
+                const optBtn = document.createElement('button');
+                optBtn.className = `p-4 rounded-xl text-left border-2 font-bold transition flex items-center justify-between text-sm md:text-base relative w-full`;
+
+                const isSelected = ans && ans.chosenOpt === idx;
+                const isCorrectOpt = idx === q.correct;
+
+                if (ans !== undefined) {
+                    // Answered state - show right/wrong styling
+                    if (isCorrectOpt) {
+                        optBtn.className += ' bg-emerald-50 border-emerald-500 text-emerald-900 shadow-sm';
+                    } else if (isSelected && !ans.isCorrect) {
+                        optBtn.className += ' bg-rose-50 border-rose-500 text-rose-900 shadow-sm';
+                    } else {
+                        optBtn.className += ' bg-slate-50 border-slate-200 text-slate-400 opacity-60';
+                    }
+                } else {
+                    // Normal state
+                    optBtn.className += ' bg-white border-slate-200 text-slate-800 hover:border-indigo-500 hover:bg-indigo-50/50 shadow-sm';
+                    optBtn.onclick = () => selectOption(currentQIndex, idx);
+                }
+
+                optBtn.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <span class="w-8 h-8 rounded-lg ${isSelected ? (ans.isCorrect ? 'bg-emerald-600 text-white' : 'bg-rose-600 text-white') : (ans && isCorrectOpt ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-600')} font-black text-xs flex items-center justify-center shrink-0">
+                            ${optionLetters[idx]}
+                        </span>
+                        <span class="font-bold">$${opt.label}$</span>
+                    </div>
+                    ${ans !== undefined && isCorrectOpt ? '<i class="fa-solid fa-circle-check text-emerald-600 text-lg"></i>' : ''}
+                    ${ans !== undefined && isSelected && !ans.isCorrect ? '<i class="fa-solid fa-circle-xmark text-rose-600 text-lg"></i>' : ''}
+                `;
+
+                optsContainer.appendChild(optBtn);
+            });
+
+            // Explanation Box
+            const expBox = document.getElementById('explanation-box');
+            const expTitle = document.getElementById('explanation-title');
+            const expBody = document.getElementById('explanation-body');
+
+            if (ans !== undefined) {
+                expBox.classList.remove('hidden');
+                if (ans.isCorrect) {
+                    expBox.className = 'mt-6 p-5 rounded-2xl transition-all duration-300 border-2 bg-emerald-50/80 border-emerald-300 text-emerald-950';
+                    expTitle.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-600 text-xl"></i> <span>Benar / Correct! 🎉</span>`;
+                } else {
+                    expBox.className = 'mt-6 p-5 rounded-2xl transition-all duration-300 border-2 bg-rose-50/80 border-rose-300 text-rose-950';
+                    expTitle.innerHTML = `<i class="fa-solid fa-circle-xmark text-rose-600 text-xl"></i> <span>Kurang Tepat / Incorrect!</span>`;
+                }
+
+                const expText = (currentLang === 'en') ? q.explain.en : q.explain.id;
+                expBody.innerHTML = `
+                    <div class="font-extrabold text-xs uppercase tracking-wider mb-1 text-slate-500">Langkah Penyelesaian / Step-by-Step:</div>
+                    <div class="text-sm font-semibold">${expText}</div>
+                `;
+            } else {
+                expBox.classList.add('hidden');
+            }
+
+            // Prev/Next Button states
+            document.getElementById('prev-btn').disabled = (currentQIndex === 0);
+            document.getElementById('next-btn').disabled = (currentQIndex === questionsData.length - 1);
+
+            renderNavPalette();
+            setTimeout(renderMath, 20);
+        }
+
+        function selectOption(qIdx, optIdx) {
+            if (userAnswers[qIdx] !== undefined) return; // Prevent re-answering locked questions
+
+            const q = questionsData[qIdx];
+            const isCorrect = (optIdx === q.correct);
+
+            userAnswers[qIdx] = {
+                chosenOpt: optIdx,
+                isCorrect: isCorrect,
+                time: new Date().toISOString()
+            };
+
+            saveState();
+            renderCurrentQuestion();
+
+            if (isCorrect) {
+                confetti({
+                    particleCount: 25,
+                    spread: 50,
+                    origin: { y: 0.8 }
+                });
+            }
+        }
+
+        function navigateQuestion(direction) {
+            const target = currentQIndex + direction;
+            if (target >= 0 && target < questionsData.length) {
+                currentQIndex = target;
+                renderCurrentQuestion();
+                saveState();
+            }
+        }
+
+        function jumpNextUnanswered() {
+            for (let i = 0; i < questionsData.length; i++) {
+                const nextIdx = (currentQIndex + 1 + i) % questionsData.length;
+                if (userAnswers[nextIdx] === undefined) {
+                    currentQIndex = nextIdx;
+                    renderCurrentQuestion();
+                    saveState();
+                    return;
+                }
+            }
+            alert("Semua soal sudah dijawab! / All questions have been answered!");
+        }
+
+        function confirmResetQuiz() {
+            if (confirm("Apakah kamu yakin ingin mengulang quiz dari awal? Semua progres jawaban akan dihapus.")) {
+                userAnswers = {};
+                currentQIndex = 0;
+                localStorage.removeItem(STORAGE_KEY);
+                saveState();
+                renderCurrentQuestion();
+                closeModal('results-modal');
+            }
+        }
+
+        function finishQuiz() {
+            let correct = 0;
+            let wrong = 0;
+            let answered = 0;
+
+            let catAljabar = { c: 0, t: 10 };
+            let catPlsv1 = { c: 0, t: 10 };
+            let catPlsv2 = { c: 0, t: 10 };
+
+            for (let i = 0; i < questionsData.length; i++) {
+                const a = userAnswers[i];
+                if (a !== undefined) {
+                    answered++;
+                    if (a.isCorrect) {
+                        correct++;
+                        if (i < 10) catAljabar.c++;
+                        else if (i < 20) catPlsv1.c++;
+                        else catPlsv2.c++;
+                    } else {
+                        wrong++;
+                    }
+                }
+            }
+
+            const scorePercent = Math.round((correct / questionsData.length) * 100);
+
+            document.getElementById('final-score-val').innerText = `${scorePercent}%`;
+            document.getElementById('final-score-detail').innerText = `Benar: ${correct} | Salah: ${wrong} | Belum Diisi: ${30 - answered}`;
+
+            document.getElementById('breakdown-aljabar').innerText = `${catAljabar.c}/10 (${catAljabar.c * 10}%)`;
+            document.getElementById('breakdown-plsv1').innerText = `${catPlsv1.c}/10 (${catPlsv1.c * 10}%)`;
+            document.getElementById('breakdown-plsv2').innerText = `${catPlsv2.c}/10 (${catPlsv2.c * 10}%)`;
+
+            const iconEl = document.getElementById('result-icon');
+            const titleEl = document.getElementById('result-title');
+
+            if (scorePercent >= 85) {
+                iconEl.innerText = '🏆';
+                titleEl.innerText = 'Luar Biasa! Algebra Master!';
+            } else if (scorePercent >= 60) {
+                iconEl.innerText = '⭐';
+                titleEl.innerText = 'Kerja Bagus! Teruskan!';
+            } else {
+                iconEl.innerText = '💡';
+                titleEl.innerText = 'Yuk Pelajari Lagi Materialnya!';
+            }
+
+            document.getElementById('results-modal').classList.remove('hidden');
+
+            if (scorePercent >= 70) {
+                confetti({
+                    particleCount: 100,
+                    spread: 80,
+                    origin: { y: 0.6 }
+                });
+            }
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            loadSavedState();
+            setLanguage(currentLang || 'bi');
+        });
+    </script>
+</body>
+</html>
